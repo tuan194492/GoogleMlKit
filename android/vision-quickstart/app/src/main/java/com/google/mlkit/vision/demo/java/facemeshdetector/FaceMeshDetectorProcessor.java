@@ -62,6 +62,7 @@ public class FaceMeshDetectorProcessor extends VisionProcessorBase<List<FaceMesh
   @Override
   protected void onSuccess(
       @NonNull List<FaceMesh> faces, @NonNull GraphicOverlay graphicOverlay) {
+    graphicOverlay.setFaceMeshesList(faces);
     for (FaceMesh face : faces) {
       graphicOverlay.add(new FaceMeshGraphic(graphicOverlay, face));
     }

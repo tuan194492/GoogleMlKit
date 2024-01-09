@@ -27,6 +27,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import com.google.mlkit.vision.facemesh.FaceMesh;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,17 @@ import java.util.List;
  * </ol>
  */
 public class GraphicOverlay extends View {
+
+  private List<FaceMesh> faceMeshesList;
+
+  public List<FaceMesh> getFaceMeshesList() {
+    return faceMeshesList;
+  }
+
+  public void setFaceMeshesList(List<FaceMesh> faceMeshesList) {
+    this.faceMeshesList = faceMeshesList;
+  }
+
   private final Object lock = new Object();
   private final List<Graphic> graphics = new ArrayList<>();
   // Matrix for transforming from image coordinates to overlay view coordinates.
