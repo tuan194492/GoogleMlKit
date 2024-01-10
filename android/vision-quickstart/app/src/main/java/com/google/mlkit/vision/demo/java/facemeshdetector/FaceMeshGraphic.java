@@ -24,10 +24,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
+import android.util.Log;
+
 import com.google.mlkit.vision.common.PointF3D;
 import com.google.mlkit.vision.common.Triangle;
 import com.google.mlkit.vision.demo.GraphicOverlay;
 import com.google.mlkit.vision.demo.GraphicOverlay.Graphic;
+import com.google.mlkit.vision.demo.java.custom.DatabaseHelper;
+import com.google.mlkit.vision.demo.java.custom.FaceData;
 import com.google.mlkit.vision.demo.preference.PreferenceUtils;
 import com.google.mlkit.vision.facemesh.FaceMesh;
 import com.google.mlkit.vision.facemesh.FaceMesh.ContourType;
@@ -42,7 +46,6 @@ import java.util.List;
  */
 public class FaceMeshGraphic extends Graphic {
   private static final int USE_CASE_CONTOUR_ONLY = 999;
-
   private static final float FACE_POSITION_RADIUS = 8.0f;
   private static final float BOX_STROKE_WIDTH = 5.0f;
 
@@ -53,6 +56,7 @@ public class FaceMeshGraphic extends Graphic {
   private float zMin;
   private float zMax;
 
+  private ArrayList<FaceData> faceData;
   @ContourType
   private static final int[] DISPLAY_CONTOURS = {
     FaceMesh.FACE_OVAL,
@@ -171,5 +175,14 @@ public class FaceMeshGraphic extends Graphic {
         translateX(point2.getX()),
         translateY(point2.getY()),
         positionPaint);
+  }
+
+  public ArrayList<FaceData> getData(){
+    if (faceData == null) {
+      DatabaseHelper dbHelper = new DatabaseHelper(this.getApplicationContext());
+      faceData = dbHelper.getAllFaceData();
+      Log.d("D", "getData: " + faceData.toString());
+    }
+    return faceData;
   }
 }
