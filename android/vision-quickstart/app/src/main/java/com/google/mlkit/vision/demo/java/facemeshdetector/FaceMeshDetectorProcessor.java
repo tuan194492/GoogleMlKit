@@ -129,7 +129,7 @@ public class FaceMeshDetectorProcessor extends VisionProcessorBase<List<FaceMesh
         distanceList.add(this.distance(faceMeshPoints.get(i), rootPoint));
         distanceList.add(this.distance(faceMeshPoints.get(i+1), rootPoint));
       }
-//                                        Log.d("D", "onSuccess: " + distanceList.toString());
+      Log.d("D", "onSuccess: " + distanceList.toString());
       for(FaceData face : faceData){
         String distanceString = face.getFaceMeshPoints();
         ArrayList<Double>distance = this.stringToArrayList(distanceString);
