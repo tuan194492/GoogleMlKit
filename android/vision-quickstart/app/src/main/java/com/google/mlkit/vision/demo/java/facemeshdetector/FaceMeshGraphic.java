@@ -56,6 +56,7 @@ public class FaceMeshGraphic extends Graphic {
   private float zMin;
   private float zMax;
 
+  private String name;
   private ArrayList<FaceData> faceData;
   @ContourType
   private static final int[] DISPLAY_CONTOURS = {
@@ -73,10 +74,12 @@ public class FaceMeshGraphic extends Graphic {
     FaceMesh.NOSE_BRIDGE
   };
 
-  FaceMeshGraphic(GraphicOverlay overlay, FaceMesh faceMesh) {
+  FaceMeshGraphic(GraphicOverlay overlay, FaceMesh faceMesh, String name) {
     super(overlay);
 
+    this.name = name;
     this.faceMesh = faceMesh;
+
     final int selectedColor = Color.WHITE;
 
     positionPaint = new Paint();
@@ -87,8 +90,10 @@ public class FaceMeshGraphic extends Graphic {
     boxPaint.setStyle(Style.STROKE);
     boxPaint.setStrokeWidth(BOX_STROKE_WIDTH);
 
-    useCase = PreferenceUtils.getFaceMeshUseCase(getApplicationContext());
+//    useCase = PreferenceUtils.getFaceMeshUseCase(getApplicationContext());
+    useCase = 999;
   }
+
 
   /** Draws the face annotations for position on the supplied canvas. */
   @Override
@@ -107,6 +112,10 @@ public class FaceMeshGraphic extends Graphic {
     rect.top = translateY(rect.top);
     rect.bottom = translateY(rect.bottom);
     canvas.drawRect(rect, boxPaint);
+
+    // Draws text
+    boxPaint.setTextSize(80);
+    canvas.drawText(name, x0, rect.top, boxPaint);
 
     // Draw face mesh
     List<FaceMeshPoint> points =

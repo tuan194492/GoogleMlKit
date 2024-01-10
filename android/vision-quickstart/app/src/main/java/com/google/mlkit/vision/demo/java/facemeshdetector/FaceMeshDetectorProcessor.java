@@ -109,8 +109,8 @@ public class FaceMeshDetectorProcessor extends VisionProcessorBase<List<FaceMesh
   protected void onSuccess(
       @NonNull List<FaceMesh> faces, @NonNull GraphicOverlay graphicOverlay) {
     graphicOverlay.setFaceMeshesList(faces);
-
-    double delta = 1;
+    String name = "Ai zậy ta";
+    double delta = 2;
 
     DatabaseHelper dbHelper = new DatabaseHelper(graphicOverlay.getContext());
     faceData = dbHelper.getAllFaceData();
@@ -135,12 +135,13 @@ public class FaceMeshDetectorProcessor extends VisionProcessorBase<List<FaceMesh
         ArrayList<Double>distance = this.stringToArrayList(distanceString);
         if(this.compareVectors(distanceList, distance, delta)){
           Log.d("Z", "tenjsid" + face.getName());
+          name = face.getName();
         }
-        else {
-          Log.d("Z", "Khong biet ai ca");
-        }
+//        else {
+//          Log.d("Z", "Khong biet ai ca");
+//        }
       }
-      graphicOverlay.add(new FaceMeshGraphic(graphicOverlay, faceMesh));
+      graphicOverlay.add(new FaceMeshGraphic(graphicOverlay, faceMesh, name));
     }
 
   }
