@@ -11,11 +11,14 @@ import android.widget.EditText;
 import com.google.mlkit.vision.demo.R;
 import com.google.mlkit.vision.demo.java.custom.DatabaseHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText editTextName;
     private Button btnSave;
-    private String faceMeshPoints;
+    private List<String> registerFaceList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +31,8 @@ public class RegisterActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            String valueShow = bundle.getString("faceMeshPoints", "");
-            faceMeshPoints = valueShow;
+            registerFaceList = bundle.getStringArrayList("faceMeshPoints");
+
         }
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,12 +43,21 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+    private void saveData(String name, String faceMeshPoints) {
+        // Lưu dữ liệu vào SQLite
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.saveFaceData(name, faceMeshPoints);
+
+        finish();
+    }
+
     private void saveData() {
         String name = editTextName.getText().toString();
 
         // Lưu dữ liệu vào SQLite
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveFaceData(name, faceMeshPoints);
+        for (String face : this.registerFaceList) {
+            this.saveData(name, face);
+        }
 
         finish();
     }

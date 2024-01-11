@@ -33,6 +33,21 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
 
+  <Button
+      android:id="@+id/save_image_button"
+      android:layout_width="118dp"
+      android:layout_height="49dp"
+      android:text="Save Image"
+      app:layout_constraintEnd_toStartOf="@+id/finish_register_button"
+      app:layout_constraintStart_toEndOf="@+id/register_button" />
+
+  <Button
+      android:id="@+id/finish_register_button"
+      android:layout_width="118dp"
+      android:layout_height="49dp"
+      android:text="Complete"
+      app:layout_constraintEnd_toStartOf="@+id/settings_button" />
+
   <include
       android:id="@+id/settings_button"
       layout="@layout/settings_style"

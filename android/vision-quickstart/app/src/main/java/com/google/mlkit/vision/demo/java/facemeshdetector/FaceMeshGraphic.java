@@ -80,7 +80,7 @@ public class FaceMeshGraphic extends Graphic {
     this.name = name;
     this.faceMesh = faceMesh;
 
-    final int selectedColor = Color.WHITE;
+    final int selectedColor = Color.BLACK;
 
     positionPaint = new Paint();
     positionPaint.setColor(selectedColor);

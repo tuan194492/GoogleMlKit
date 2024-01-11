@@ -111,6 +111,23 @@ public final class CameraXLivePreviewActivity extends AppCompatActivity
 
   private Button registerButton;
 
+
+  private List<FaceMesh> faceMeshRegisterList;
+
+  public List<FaceMesh> getFaceMeshRegisterList() {
+    if (this.faceMeshRegisterList == null) {
+      this.faceMeshRegisterList = new ArrayList<>();
+    }
+    return faceMeshRegisterList;
+  }
+
+  public void setFaceMeshRegisterList(List<FaceMesh> faceMeshRegisterList) {
+    this.faceMeshRegisterList = faceMeshRegisterList;
+  }
+
+  private Button saveImageButton;
+  private Button finishRegisterButton;
+
   @Nullable private ProcessCameraProvider cameraProvider;
   @Nullable private Camera camera;
   @Nullable private Preview previewUseCase;
@@ -150,7 +167,6 @@ public final class CameraXLivePreviewActivity extends AppCompatActivity
       intent.putExtras(bundle);
       startActivity(intent);
     }
-
   }
   private double distance(FaceMeshPoint point1, FaceMeshPoint point2){
     float x1 = point1.getPosition().getX();
@@ -184,26 +200,33 @@ public final class CameraXLivePreviewActivity extends AppCompatActivity
     }
 
     registerButton = findViewById(R.id.register_button);
+    finishRegisterButton = findViewById(R.id.finish_register_button);
+    saveImageButton = findViewById(R.id.save_image_button);
 
-    registerButton.setOnClickListener(this::onClickRecord);
+    registerButton.setOnClickListener(this::onClickBeginRegister);
+    saveImageButton.setOnClickListener(this::onSaveImage);
+    finishRegisterButton.setOnClickListener(this::onClickFinishRegister);
+
+    this.currentState = State.Processing;
+    this.onChangeState();
 
     Spinner spinner = findViewById(R.id.spinner);
     List<String> options = new ArrayList<>();
-    options.add(OBJECT_DETECTION);
-    options.add(OBJECT_DETECTION_CUSTOM);
-    options.add(CUSTOM_AUTOML_OBJECT_DETECTION);
-    options.add(FACE_DETECTION);
-    options.add(BARCODE_SCANNING);
-    options.add(IMAGE_LABELING);
-    options.add(IMAGE_LABELING_CUSTOM);
-    options.add(CUSTOM_AUTOML_LABELING);
-    options.add(POSE_DETECTION);
-    options.add(SELFIE_SEGMENTATION);
-    options.add(TEXT_RECOGNITION_LATIN);
-    options.add(TEXT_RECOGNITION_CHINESE);
-    options.add(TEXT_RECOGNITION_DEVANAGARI);
-    options.add(TEXT_RECOGNITION_JAPANESE);
-    options.add(TEXT_RECOGNITION_KOREAN);
+//    options.add(OBJECT_DETECTION);
+//    options.add(OBJECT_DETECTION_CUSTOM);
+//    options.add(CUSTOM_AUTOML_OBJECT_DETECTION);
+//    options.add(FACE_DETECTION);
+//    options.add(BARCODE_SCANNING);
+//    options.add(IMAGE_LABELING);
+//    options.add(IMAGE_LABELING_CUSTOM);
+//    options.add(CUSTOM_AUTOML_LABELING);
+//    options.add(POSE_DETECTION);
+//    options.add(SELFIE_SEGMENTATION);
+//    options.add(TEXT_RECOGNITION_LATIN);
+//    options.add(TEXT_RECOGNITION_CHINESE);
+//    options.add(TEXT_RECOGNITION_DEVANAGARI);
+//    options.add(TEXT_RECOGNITION_JAPANESE);
+//    options.add(TEXT_RECOGNITION_KOREAN);
     options.add(FACE_MESH_DETECTION);
 
     // Creating adapter for spinner
@@ -236,6 +259,83 @@ public final class CameraXLivePreviewActivity extends AppCompatActivity
               SettingsActivity.LaunchSource.CAMERAX_LIVE_PREVIEW);
           startActivity(intent);
         });
+  }
+
+  private void onClickBeginRegister(View view) {
+      Toast.makeText(this, "Start registering", Toast.LENGTH_SHORT).show();
+      this.currentState = State.Registering;
+      this.onChangeState();
+      this.setFaceMeshRegisterList(null);
+  }
+
+
+
+  private void onSaveImage(View view) {
+      List<FaceMesh> faceMeshes = this.graphicOverlay.getFaceMeshesList();
+      if (faceMeshes.size() == 0) {
+          Toast.makeText(this, "No face detected", Toast.LENGTH_SHORT).show();
+      } else if (faceMeshes.size() > 1) {
+          Toast.makeText(this, "More than 1 face detected", Toast.LENGTH_SHORT).show();
+      } else {
+        Toast.makeText(this, "Save image successfully", Toast.LENGTH_SHORT).show();
+        this.getFaceMeshRegisterList().add(faceMeshes.get(0));
+      }
+  }
+
+  private void onClickFinishRegister(View view) {
+    if (this.getFaceMeshRegisterList().size() >= 1) {
+      Bundle bundle = new Bundle();
+      List<FaceMesh> faceMeshes = this.getFaceMeshRegisterList();
+      ArrayList<String> faceDistanceList = new ArrayList<>();
+        if (faceMeshes != null) {
+          ArrayList<ArrayList<Float>> faceMeshPointList = new ArrayList<>();
+          ArrayList<Double> distanceList = new ArrayList<>();
+
+          for (FaceMesh faceMesh : faceMeshes) {
+            List<FaceMeshPoint> faceMeshPoints = new ArrayList<>();
+            FaceMeshPoint rootPoint = faceMesh.getPoints(12).get(3);
+            for (int i=1;i<=12;i++){
+              int len = faceMesh.getPoints(i).size();
+              faceMeshPoints.add(faceMesh.getPoints(i).get(0));
+              faceMeshPoints.add(faceMesh.getPoints(i).get(len - 1));
+            }
+            int l = faceMeshPoints.size();
+            for(int i=0; i<l;i+=2){
+              distanceList.add(this.distance(faceMeshPoints.get(i), faceMeshPoints.get(i+1)));
+              distanceList.add(this.distance(faceMeshPoints.get(i), rootPoint));
+              distanceList.add(this.distance(faceMeshPoints.get(i+1), rootPoint));
+            }
+            faceDistanceList.add(distanceList.toString());
+          }
+//          Log.d("Z", "onClickRecord: " + distanceList.toString());
+          Intent intent = new Intent(CameraXLivePreviewActivity.this, RegisterActivity.class);
+          bundle.putStringArrayList("faceMeshPoints", faceDistanceList);
+          intent.putExtras(bundle);
+          startActivity(intent);
+        }
+      }
+    this.currentState = State.Processing;
+    this.onChangeState();
+
+  }
+
+  private enum State {
+    Processing,
+    Registering
+  }
+
+  private State currentState;
+
+  public void onChangeState() {
+     if (currentState == State.Processing) {
+          finishRegisterButton.setVisibility(View.GONE);
+          saveImageButton.setVisibility(View.GONE);
+          registerButton.setVisibility(View.VISIBLE);
+     } else if (currentState == State.Registering) {
+         finishRegisterButton.setVisibility(View.VISIBLE);
+         saveImageButton.setVisibility(View.VISIBLE);
+         registerButton.setVisibility(View.GONE);
+     }
   }
 
   @Override
