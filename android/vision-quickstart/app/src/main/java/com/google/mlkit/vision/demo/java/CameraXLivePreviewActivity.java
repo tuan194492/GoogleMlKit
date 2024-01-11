@@ -288,10 +288,8 @@ public final class CameraXLivePreviewActivity extends AppCompatActivity
       List<FaceMesh> faceMeshes = this.getFaceMeshRegisterList();
       ArrayList<String> faceDistanceList = new ArrayList<>();
         if (faceMeshes != null) {
-          ArrayList<ArrayList<Float>> faceMeshPointList = new ArrayList<>();
-          ArrayList<Double> distanceList = new ArrayList<>();
-
           for (FaceMesh faceMesh : faceMeshes) {
+            ArrayList<Double> distanceList = new ArrayList<>();
             List<FaceMeshPoint> faceMeshPoints = new ArrayList<>();
             FaceMeshPoint rootPoint = faceMesh.getPoints(12).get(3);
             for (int i=1;i<=12;i++){
